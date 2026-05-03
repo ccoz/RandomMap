@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RandomMap Stripe Billing Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="control-panel" aria-labelledby="app-title">
+        <div>
+          <h3 id="app-title">RandomMap：随机地址生成器</h3>
+          <p class="lede">使用 Google Maps 地点地址生成</p>
+        </div>
+
+        <form id="generator-form" class="generator-form">
+          <label class="field">
+            <span>国家 / 地区</span>
+            <select id="country" name="country"></select>
+          </label>
+
+          <label class="field">
+            <span>州、省或行政区</span>
+            <select id="region" name="region"></select>
+          </label>
+
+          <div class="field">
+            <label for="google-maps-key">Google Maps API Key</label>
+            <div class="api-key-row">
+              <input
+                id="google-maps-key"
+                name="googleMapsApiKey"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="AIza..."
+              />
+              <button id="save-api-key" class="small-action" type="button">保存</button>
+              <button id="clear-api-key" class="small-action muted" type="button">清除</button>
+            </div>
+          </div>
+
+          <fieldset class="field">
+            <legend>地点类型</legend>
+            <div class="segmented" role="radiogroup" aria-label="地点类型">
+              <label><input type="radio" name="category" value="mixed" checked /><span>混合</span></label>
+              <label><input type="radio" name="category" value="hotel" /><span>酒店</span></label>
+              <label><input type="radio" name="category" value="office" /><span>办公</span></label>
+              <label><input type="radio" name="category" value="residential" /><span>住宅</span></label>
+            </div>
+          </fieldset>
+
+          <button id="generate" class="primary-action" type="submit">
+            <span>生成账单资料</span>
+          </button>
+        </form>
+
+        <div class="source-status" id="source-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="status-text">正在检测数据源...</span>
+        </div>
+      </section>
+
+      <section class="result-panel" aria-live="polite">
+        <div class="result-header">
+          <div>
+            <h3 class="eyebrow">生成结果</h3>
+            <p id="result-title">等待生成</p>
+          </div>
+          <button id="copy-json" class="ghost-action" type="button" disabled>复制 JSON</button>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <div class="map-plate" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p>生成后会显示 Stripe 测试卡、账单地址、坐标和 Google Maps 来源。</p>
+        </div>
+
+        <div id="result" class="result-grid is-hidden">
+          <article class="info-block card-block">
+            <div class="block-title">
+              <span>Stripe Test Card</span>
+              <strong id="card-brand">Visa</strong>
+            </div>
+            <dl class="data-list">
+              <div>
+                <dt>卡号</dt>
+                <dd id="card-number" class="mono"></dd>
+              </div>
+              <div>
+                <dt>有效期</dt>
+                <dd id="card-exp" class="mono"></dd>
+              </div>
+              <div>
+                <dt>CVC</dt>
+                <dd id="card-cvc" class="mono"></dd>
+              </div>
+              <div>
+                <dt>模式</dt>
+                <dd id="stripe-mode"></dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="info-block">
+            <div class="block-title">
+              <span>Billing Customer</span>
+              <strong id="customer-country"></strong>
+            </div>
+            <dl class="data-list">
+              <div>
+                <dt>姓名</dt>
+                <dd id="customer-name"></dd>
+              </div>
+              <div>
+                <dt>邮箱</dt>
+                <dd id="customer-email" class="mono"></dd>
+              </div>
+              <div>
+                <dt>电话</dt>
+                <dd id="customer-phone"></dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="info-block wide">
+            <div class="block-title">
+              <span>Billing Address</span>
+              <strong id="address-country"></strong>
+            </div>
+            <dl class="data-list address-list">
+              <div>
+                <dt>Street 1</dt>
+                <dd id="address-line1"></dd>
+              </div>
+              <div>
+                <dt>Street 2</dt>
+                <dd id="address-line2"></dd>
+              </div>
+              <div>
+                <dt>City</dt>
+                <dd id="address-city"></dd>
+              </div>
+              <div>
+                <dt>State</dt>
+                <dd id="address-state"></dd>
+              </div>
+              <div>
+                <dt>Postal</dt>
+                <dd id="address-postal" class="mono"></dd>
+              </div>
+            </dl>
+          </article>
+
+          <article class="info-block map-block wide">
+            <div class="map-canvas" aria-hidden="true">
+              <div class="pin"></div>
+              <div class="route route-a"></div>
+              <div class="route route-b"></div>
+            </div>
+            <div class="place-copy">
+              <div class="block-title">
+                <span>Google Maps Source</span>
+                <strong id="source-mode"></strong>
+              </div>
+              <h3 id="place-name"></h3>
+              <p id="place-address"></p>
+              <dl class="coordinate-list">
+                <div>
+                  <dt>Latitude</dt>
+                  <dd id="place-lat" class="mono"></dd>
+                </div>
+                <div>
+                  <dt>Longitude</dt>
+                  <dd id="place-lng" class="mono"></dd>
+                </div>
+              </dl>
+              <a id="maps-link" class="maps-link" href="#" target="_blank" rel="noreferrer">打开 Google Maps</a>
+            </div>
+          </article>
+        </div>
+
+        <p id="error" class="error-message" role="alert"></p>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

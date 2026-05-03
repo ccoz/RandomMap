@@ -1,0 +1,18 @@
+{
+  "name": "random-map",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate Stripe test billing profiles from country and region selections using Google Maps place data.",
+  "scripts": {
+    "check": "node --check server.mjs && node --check lib/billing.mjs && node --check lib/vercel-response.mjs && node --check api/health.mjs && node --check api/geo.mjs && node --check api/generate.mjs && node --check public/app.js",
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "country-region-data": "^4.1.0"
+  }
+}
