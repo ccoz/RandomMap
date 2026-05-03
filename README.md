@@ -46,9 +46,9 @@ http://localhost:5173
 项目已经适配 Vercel：
 
 - `public/`：静态页面、样式和前端脚本。
-- `api/health.mjs`：`/api/health`
-- `api/geo.mjs`：`/api/geo`
-- `api/generate.mjs`：`/api/generate`
+- `api/health.js`：`/api/health`
+- `api/geo.js`：`/api/geo`
+- `api/generate.js`：`/api/generate`
 - `lib/`：本地服务和 Vercel Functions 共用的生成逻辑。
 - `vercel.json`：将静态输出目录指定为 `public`。
 
@@ -62,9 +62,13 @@ Install Command: npm install
 Root Directory: ./
 ```
 
+这些设置也已经写入 `vercel.json`，通常直接 Import 仓库并部署即可。部署日志里应能看到 `api/health.js`、`api/geo.js`、`api/generate.js` 被识别为 Functions。
+
 不需要在 Vercel 配置 `GOOGLE_MAPS_API_KEY` 环境变量。本项目只使用网页端输入并保存到浏览器 `localStorage` 的 Key，生成时由浏览器发送给 `/api/generate`。
 
 部署完成后打开站点，先访问 `/api/health` 应返回 `browser-key-required`，再访问 `/api/geo` 应返回国家 / 地区数据。首页会优先读取 `/api/geo`，如果函数暂时不可用，会自动回退到构建时生成的 `/geo.json`。
+
+如果点击“生成账单资料”仍提示 `Request failed with 404`，说明 Vercel 没有部署到最新的 `api/generate.js` 函数。请在 Vercel 里重新部署最新提交，并确认部署日志中出现 `api/generate.js`；必要时使用 `Redeploy` 并取消复用构建缓存。
 
 ## Google Maps 配置
 

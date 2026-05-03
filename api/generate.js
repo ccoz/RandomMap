@@ -1,5 +1,5 @@
 import { buildBillingProfile } from "../lib/billing.mjs";
-import { errorJson, json, methodNotAllowed, readJson } from "../lib/vercel-response.mjs";
+import { errorJson, methodNotAllowed, readJson } from "../lib/vercel-response.mjs";
 
 export default {
   async fetch(request) {
@@ -20,7 +20,11 @@ async function handleGenerate(request) {
   try {
     const body = await readJson(request);
     const payload = await buildBillingProfile(body);
-    return json(payload);
+    return Response.json(payload, {
+      headers: {
+        "Cache-Control": "no-store"
+      }
+    });
   } catch (error) {
     return errorJson(error);
   }
