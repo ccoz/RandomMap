@@ -311,7 +311,8 @@ async function postJson(url, body) {
 async function parseJsonResponse(response) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.error || `Request failed with ${response.status}`);
+    const message = [payload.error, payload.detail].filter(Boolean).join("：");
+    throw new Error(message || `Request failed with ${response.status}`);
   }
   return payload;
 }

@@ -1,17 +1,7 @@
 import { createHealthPayload } from "../lib/billing.mjs";
-import { json, methodNotAllowed } from "../lib/vercel-response.mjs";
+import { methodNotAllowed, sendJson } from "../lib/vercel-response.mjs";
 
-export default {
-  fetch(request) {
-    if (request.method !== "GET") return methodNotAllowed(["GET"]);
-    return json(createHealthPayload());
-  }
-};
-
-export function GET() {
-  return json(createHealthPayload());
-}
-
-export function POST() {
-  return methodNotAllowed(["GET"]);
+export default async function handler(request, response) {
+  if (request.method !== "GET") return methodNotAllowed(response, ["GET"]);
+  return sendJson(response, 200, createHealthPayload());
 }
