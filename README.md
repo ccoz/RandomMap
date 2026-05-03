@@ -56,7 +56,7 @@ http://localhost:5173
 
 ```text
 Framework Preset: Other
-Build Command: 留空
+Build Command: npm run build
 Output Directory: public
 Install Command: npm install
 Root Directory: ./
@@ -64,7 +64,7 @@ Root Directory: ./
 
 不需要在 Vercel 配置 `GOOGLE_MAPS_API_KEY` 环境变量。本项目只使用网页端输入并保存到浏览器 `localStorage` 的 Key，生成时由浏览器发送给 `/api/generate`。
 
-部署完成后打开站点，先访问 `/api/health` 应返回 `browser-key-required`，再回首页输入 Google Maps API Key 并保存。
+部署完成后打开站点，先访问 `/api/health` 应返回 `browser-key-required`，再访问 `/api/geo` 应返回国家 / 地区数据。首页会优先读取 `/api/geo`，如果函数暂时不可用，会自动回退到构建时生成的 `/geo.json`。
 
 ## Google Maps 配置
 

@@ -216,13 +216,22 @@ async function loadGeoData() {
   nodes.generate.querySelector("span").textContent = "正在加载地区...";
 
   try {
-    const geo = await getJson("/api/geo");
+    const geo = await loadGeoPayload();
     state.geoCountries = Array.isArray(geo.countries) ? geo.countries : [];
+    if (!state.geoCountries.length) throw new Error("Empty geo payload");
     populateCountries();
     setLoading(false);
   } catch {
     showError("国家 / 地区数据加载失败，请刷新页面。");
     nodes.generate.querySelector("span").textContent = "地区数据不可用";
+  }
+}
+
+async function loadGeoPayload() {
+  try {
+    return await getJson("/api/geo");
+  } catch {
+    return getJson("/geo.json");
   }
 }
 

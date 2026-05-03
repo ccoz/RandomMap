@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Generate Stripe test billing profiles from country and region selections using Google Maps place data.",
   "scripts": {
+    "build": "node scripts/write-geo.mjs",
     "check": "node --check server.mjs && node --check lib/billing.mjs && node --check lib/vercel-response.mjs && node --check api/health.mjs && node --check api/geo.mjs && node --check api/generate.mjs && node --check public/app.js",
     "dev": "node server.mjs",
     "start": "node server.mjs"
