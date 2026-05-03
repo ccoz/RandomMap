@@ -50,19 +50,19 @@ http://localhost:5173
 - `api/geo.js`：`/api/geo`
 - `api/generate.js`：`/api/generate`
 - `lib/`：本地服务和 Vercel Functions 共用的生成逻辑。
-- `vercel.json`：将静态输出目录指定为 `public`。
+- `vercel.json`：将静态输出目录指定为 `dist`。
 
 在 Vercel 新建项目时选择这个仓库，部署设置如下：
 
 ```text
 Framework Preset: Other
 Build Command: npm run build
-Output Directory: public
+Output Directory: dist
 Install Command: npm install
 Root Directory: ./
 ```
 
-这些设置也已经写入 `vercel.json`，通常直接 Import 仓库并部署即可。部署日志里应能看到 `api/health.js`、`api/geo.js`、`api/generate.js` 被识别为 Functions。
+这些设置也已经写入 `vercel.json`，通常直接 Import 仓库并部署即可。`npm run build` 会把 `public/` 复制到 `dist/`，并生成 `dist/geo.json`。部署日志里应能看到 `Built dist`，并看到 `api/health.js`、`api/geo.js`、`api/generate.js` 被识别为 Functions。
 
 不需要在 Vercel 配置 `GOOGLE_MAPS_API_KEY` 环境变量。本项目只使用网页端输入并保存到浏览器 `localStorage` 的 Key，生成时由浏览器发送给 `/api/generate`。
 
