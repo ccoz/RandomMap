@@ -309,12 +309,47 @@ async function postJson(url, body) {
 }
 
 async function parseJsonResponse(response) {
-  const payload = await response.json().catch(() => ({}));
+  const responseText = await response.text();
+  const payload = parseJsonPayload(responseText);
+
   if (!response.ok) {
     const message = [payload.error, payload.detail].filter(Boolean).join("：");
-    throw new Error(message || `Request failed with ${response.status}`);
+    throw new Error(message || readableHttpError(response, responseText));
   }
+
   return payload;
+}
+
+function parseJsonPayload(responseText) {
+  if (!responseText) return {};
+
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    return {};
+  }
+}
+
+function readableHttpError(response, responseText) {
+  const text = stripHtml(responseText).trim();
+
+  if (text.includes("FUNCTION_INVOCATION_FAILED")) {
+    return "Vercel Function 执行失败。请在 Vercel 的 Functions 日志中查看 /api/generate 的服务端异常。";
+  }
+
+  if (text.includes("Authentication Required")) {
+    return "当前 Vercel 部署开启了访问保护。请关闭 Deployment Protection，或登录后再访问。";
+  }
+
+  return text ? `Request failed with ${response.status}: ${text.slice(0, 240)}` : `Request failed with ${response.status}`;
+}
+
+function stripHtml(value) {
+  return String(value || "")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ");
 }
 
 function setLoading(loading) {
